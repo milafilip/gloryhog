@@ -9,5 +9,7 @@
         "noLib": false,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true
-    }
+    },
+    "buildOnSave": false,
+    "compileOnSave": false
 }

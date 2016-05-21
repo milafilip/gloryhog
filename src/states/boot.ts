@@ -17,6 +17,7 @@ export class Boot extends Phaser.State {
     }
 
     create() {
+      // this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
       this.game.input.maxPointers = 1;
 
       if (!this.game.device.desktop) {

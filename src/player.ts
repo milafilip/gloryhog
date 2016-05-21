@@ -3,49 +3,52 @@ export class Player extends Phaser.Sprite {
   private _health: number = 100;
   private healthText: Phaser.Text;
 
+  private jumpCount:number = 0;
+
   private leftDownAt: number = 0;
   private rightDownAt: number = 0;
 
-  ms;
-  canJump;
-  direction;
-  mouseY;
-  jumpedAt;
-  jumpDelay;
+  private jumpHeight: number = 400;
 
-  constructor(game: Phaser.Game, x: number, y: number) {
+  private ms: number = 0;
+
+  private leftButton;
+  private rightButton;
+
+  private canJump;
+  public direction;
+
+  public state;
+
+  constructor(game: Phaser.Game, x: number, y: number, leftButton, rightButton) {
     super(game, x, y, 'player', 0);
     this.anchor.setTo(0.5, 0);
+    this.rightButton = rightButton;
+    this.leftButton = leftButton;
+
     game.add.existing(this);
     game.physics.arcade.enableBody(this);
-
-    let fontStyle = {
-      font: '14px Galindo',
-      fill: 'red'
-    };
-    this.healthText = game.add.text(0, 0, this.health.toString(), fontStyle);
-    this.healthText.anchor.setTo(0.5, 0);
   }
 
   create() {
-    this.mouseY = 0;
-    this.jumpedAt = 0;
-    this.jumpDelay = 1000;
+    // this.mouseY = 0;
+    // this.jumpDelay = 1000;
     this.canJump = true;
-    this.ms = 0;
+    // this.game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
+    // this.body.gravity.y = 500;
   }
 
   update() {
+    this.ms = new Date().getTime();
+    this.direction = "";
 
-          this.ms = new Date().getTime();
-          this.direction = "";
+    // this.healthText.x = this.body.x + this.body.width/2;
+    // this.healthText.y = this.body.y - 10;
 
-    this.healthText.x = this.body.x + this.body.width/2;
-    this.healthText.y = this.body.y - 10;
-
-    if (this.game.input.activePointer.leftButton.isDown)
+    if (this.leftButton.isDown)
     {
-      if (this.game.input.activePointer.rightButton.isUp) {
+      if (this.rightButton.isUp) {
           this.leftDownAt = this.ms;
       }
     } else {
@@ -53,9 +56,9 @@ export class Player extends Phaser.Sprite {
       this.canJump = true;
     }
 
-    if (this.game.input.activePointer.rightButton.isDown)
+    if (this.rightButton.isDown)
     {
-      if (this.game.input.activePointer.leftButton.isUp) {
+      if (this.leftButton.isUp) {
           this.rightDownAt = this.ms;
       }
     } else {
@@ -63,7 +66,7 @@ export class Player extends Phaser.Sprite {
       this.canJump = true;
     }
 
-    if (this.game.input.activePointer.rightButton.isUp && this.game.input.activePointer.leftButton.isUp) {
+    if (this.rightButton.isUp && this.leftButton.isUp) {
       this.direction = "";
     }
 
@@ -82,22 +85,31 @@ export class Player extends Phaser.Sprite {
       this.body.velocity.x = 0;
     }
 
+
+
+
     if (
-      (this.game.input.activePointer.rightButton.isDown &&
-        this.game.input.activePointer.leftButton.isDown) &&
+      ( this.rightButton.isDown &&
+        this.leftButton.isDown) &&
+        this.jumpCount < 1 &&
         this.canJump //(player.body.touching.down)
       )
     {
       this.canJump = false;
-      this.body.velocity.y = -500;
+      this.jumpCount++;
+      this.body.velocity.y = -this.jumpHeight;
     }
 
+if (this.body.touching.down) {
+  this.jumpCount = 0;
+}
+
     if (
-        (this.game.input.activePointer.rightButton.isUp &&
-          this.game.input.activePointer.leftButton.isUp) &&
+        (this.rightButton.isUp &&
+          this.leftButton.isUp) &&
         !(this.body.touching.down)
     ) {
-        this.body.velocity.y = 1800;
+        this.body.velocity.y = 1500;
     }
 
   }

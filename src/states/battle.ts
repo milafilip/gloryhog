@@ -4,18 +4,11 @@ export class Battle extends Phaser.State {
     text: Phaser.Text;
 
     player: Player;
+    player2: Player;
+
+    players;
+
     platforms;
-    cursors;
-    jumpButton;
-
-    mouseY;
-    rightDownAt;
-
-    ms: Number;
-    jumpedAt;
-    jumpDelay;
-    canJump;
-    direction: String;
 
     preload() {
       this.game.stage.backgroundColor = '#85b5e1';
@@ -25,26 +18,24 @@ export class Battle extends Phaser.State {
       this.game.load.image('platform', 'sprites/platform.png');
     }
 
+    // pairwise(list) {
+    //   if (list.length < 2) { return []; }
+    //   var first = list[0],
+    //       rest  = list.slice(1),
+    //       pairs = rest.map(function (x) { return [first, x]; });
+    //   return pairs.concat(this.pairwise(rest));
+    // }
+
     create() {
-      let fontStyle = {
-        font: '18px Walter Turncoat',
-        fill: '#7edcfc'
-      };
-      this.direction = "A";
-      this.ms = 0;
+      let cursors = this.game.input.keyboard.createCursorKeys();
 
-      this.text = this.add.text(this.world.centerX, 50,
-                              'BATTLE', fontStyle);
-      this.text.anchor.setTo(0.5, 0.5);
+      this.players = [
+        new Player(this.game,100,200,this.game.input.activePointer.leftButton, this.game.input.activePointer.rightButton),
+        new Player(this.game,300,200,this.game.input.keyboard.addKey(Phaser.Keyboard.A), this.game.input.keyboard.addKey(Phaser.Keyboard.D))
+      ];
 
-      this.player = new Player(this.game, 100, 200);
-
-      this.game.physics.arcade.enable(this.player);
       this.game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
       this.game.physics.arcade.gravity.y = 800;
-      this.player.body.collideWorldBounds = true;
-      this.player.body.gravity.y = 500;
-
       this.platforms = this.game.add.physicsGroup(Phaser.Physics.ARCADE);
 
       this.platforms.create(500, 150, 'platform');
@@ -56,12 +47,13 @@ export class Battle extends Phaser.State {
     }
 
     update() {
-      this.game.physics.arcade.collide(this.player, this.platforms);
+      for (var i = 0; i < this.players.length; i++) {
+        this.game.physics.arcade.collide(this.players[i], this.platforms);
+      }
+      this.game.physics.arcade.collide(this.players[0], this.players[1]);
     }
 
     render() {
-      this.game.debug.text("Left Button: " + (this.game.input.activePointer.leftButton.isDown).toString(), 300, 132);
-      // this.game.debug.text("Right Button: " + this.player.ms.toString(), 300, 260);
     }
 
 

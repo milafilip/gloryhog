@@ -16,7 +16,7 @@ export class Battle extends Phaser.State {
       this.game.stage.backgroundColor = '#85b5e1';
       // this.game.load.baseURL = 'http://examples.phaser.io/assets/';
       // this.game.load.crossOrigin = 'anonymous';
-      this.game.load.image('player', 'assets/images/phaser-dude.png');
+      this.game.load.image('player', 'assets/images/guy.png');
       this.game.load.image('platform', 'assets/images/platform.png');
 
       this.game.load.tilemap('map', 'assets/tilemaps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
@@ -48,9 +48,10 @@ export class Battle extends Phaser.State {
         new Player(this.game,250,0,this.game.input.keyboard.addKey(Phaser.Keyboard.A), this.game.input.keyboard.addKey(Phaser.Keyboard.S)),
         new Player(this.game,500,0,this.game.input.keyboard.addKey(Phaser.Keyboard.G), this.game.input.keyboard.addKey(Phaser.Keyboard.H))
       ];
+
+      new Spotlight(this.game, this.players[0]);
       this.playerPairs = this.pairwise(this.players);
       //
-      new Spotlight(this.game, this.players[0]);
       //
       // // this.game.camera.follow(this.players[0], Phaser.Camera.FOLLOW_PLATFORMER);
 
@@ -78,6 +79,7 @@ export class Battle extends Phaser.State {
       for (var i = 0; i < this.players.length; i++) {
         // this.game.physics.arcade.collide(this.players[i], this.platforms);
           this.game.physics.arcade.collide(this.players[i], this.layer);
+          // this.game.debug.body(this.players[i]);
       }
       for (var i = 0; i < this.playerPairs.length; i++) {
         this.game.physics.arcade.collide(this.playerPairs[i][0], this.playerPairs[i][1]);

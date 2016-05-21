@@ -25,12 +25,12 @@ export class Player extends Phaser.Sprite {
 
   constructor(game: Phaser.Game, x: number, y: number, leftButton, rightButton, local = false) {
     super(game, x, y, 'player', 0);
-    this.anchor.setTo(0.5, 0);
     this.local = local;
     this.rightButton = rightButton;
     this.leftButton = leftButton;
     game.add.existing(this);
     game.physics.arcade.enableBody(this);
+    this.body.setSize(20, 20, 10, 47);
   }
 
   create() {
@@ -39,6 +39,8 @@ export class Player extends Phaser.Sprite {
     this.canJump = true;
     this.body.collideWorldBounds = true;
     this.body.maxVelocity.y = 1000;
+    this.anchor.set(0.5)
+    console.log(this);
     // this.body.gravity.y = 500;
     // this.body.gravity.y = 100;
     // this.game.world.wrap(this, 0, true);

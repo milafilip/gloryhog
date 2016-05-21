@@ -11,7 +11,6 @@ export class Boot extends Phaser.State {
     preload() {
       this.load.script('webfont',
           '//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js');
-
       this.load.image('loadingBarBg', 'assets/images/loading-bar-bg.png');
       this.load.image('loadingBar', 'assets/images/loading-bar.png');
     }
@@ -27,6 +26,8 @@ export class Boot extends Phaser.State {
 
       this.scale.pageAlignHorizontally = true;
       this.scale.pageAlignVertically = true;
+
+      this.game.world.setBounds(0, 0, 1024, 768);
 
       //this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // Use max screen space
     }

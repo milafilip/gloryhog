@@ -26,7 +26,8 @@ var gulp = require('gulp'),
         html: 'src/**/*.html',
         images: 'src/assets/images/**/*.*',
         scss: 'src/scss/**/*.scss',
-        scssMain: 'src/scss/main.scss'
+        scssMain: 'src/scss/main.scss',
+        tilemaps: 'src/assets/tilemaps/*.json'
     };
 
 gulp.task('clean', () => del('dist/'));
@@ -66,6 +67,11 @@ gulp.task('images', () => {
         .pipe(gulp.dest('dist/assets/images/'));
 });
 
+gulp.task('tilemaps', () => {
+    return gulp.src(paths.tilemaps)
+        .pipe(gulp.dest('dist/assets/tilemaps/'));
+});
+
 gulp.task('minify', () => {
     let js = gulp.src('dist/**/*.js')
         .pipe(jsMin())
@@ -82,6 +88,7 @@ gulp.task('watch', () => {
         watchHtml   = gulp.watch(paths.html, ['html']),
         watchTs     = gulp.watch(paths.ts, ['tsc']),
         watchImages = gulp.watch(paths.images, ['images']),
+        watchTilemaps = gulp.watch(paths.tilemaps, ['tilemaps']),
 
         onChanged = (event) => console.log('File ' + event.path + ' was ' +
             event.type + '. Running tasks...');
@@ -90,6 +97,7 @@ gulp.task('watch', () => {
     watchHtml.on('change', onChanged);
     watchTs.on('change', onChanged);
     watchImages.on('change', onChanged);
+    watchTilemaps.on('change', onChanged);
 });
 
-gulp.task('default', [ 'html', 'tsc', 'scss', 'vendor', 'images' ]);
+gulp.task('default', [ 'html', 'tsc', 'scss', 'vendor', 'images', 'tilemaps' ]);

@@ -4,4 +4,12 @@ body {
     canvas {
         border: 1px solid #424242;
     }
+
+    #stage {
+      margin: 0 auto;
+      position: relative;
+      z-index: 1000;
+      top: -20px;
+      pointer-events: none;
+    }
 }

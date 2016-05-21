@@ -8,7 +8,7 @@ import { Battle } from './states/battle';
 
 export class MyGame extends Phaser.Game {
     constructor() {
-        super(1024, 768, Phaser.CANVAS);
+        super(1024, 768, Phaser.AUTO);
 
         this.state.add('Boot', Boot);
         this.state.add('Loading', Loading);

@@ -18,11 +18,15 @@ export class Player extends Phaser.Sprite {
   private canJump;
   public direction;
 
+  private spotlight;
+  public local;
+
   public state;
 
-  constructor(game: Phaser.Game, x: number, y: number, leftButton, rightButton) {
+  constructor(game: Phaser.Game, x: number, y: number, leftButton, rightButton, local = false) {
     super(game, x, y, 'player', 0);
     this.anchor.setTo(0.5, 0);
+    this.local = local;
     this.rightButton = rightButton;
     this.leftButton = leftButton;
     game.add.existing(this);
@@ -33,15 +37,29 @@ export class Player extends Phaser.Sprite {
     // this.mouseY = 0;
     // this.jumpDelay = 1000;
     this.canJump = true;
-    // this.game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
-    this.body.maxVelocity.y = 200;
+    this.body.maxVelocity.y = 1000;
     // this.body.gravity.y = 500;
-    this.body.gravity.y = 10;
+    // this.body.gravity.y = 100;
+    // this.game.world.wrap(this, 0, true);
+  }
 
+  checkOverlap(spriteA, spriteB) {
+    let boundsA = spriteA.getBounds();
+    let boundsB = spriteB.getBounds();
+    return Phaser.Rectangle.intersects(boundsA, boundsB);
+  }
+
+  respawn() {
+    this.body.y = 0;
+    this.body.x = this.game.rnd.integerInRange(0, 400);
   }
 
   update() {
+
+
+    // if (this.body.y > 800) this.body.y = 0;
+
     this.ms = new Date().getTime();
     this.direction = "";
 
@@ -87,9 +105,6 @@ export class Player extends Phaser.Sprite {
       this.body.velocity.x = 0;
     }
 
-
-
-
     if (
       ( this.rightButton.isDown &&
         this.leftButton.isDown) &&
@@ -100,18 +115,21 @@ export class Player extends Phaser.Sprite {
       this.canJump = false;
       this.jumpCount++;
       this.body.velocity.y = -this.jumpHeight;
+      if (!this.body.onFloor()) {
+        this.body.velocity.y -= 200;
+      }
     }
 
-if (this.body.touching.down) {
-  this.jumpCount = 0;
-}
+    if (this.body.blocked.down) {
+      this.jumpCount = 0;
+    }
 
     if (
         (this.rightButton.isUp &&
           this.leftButton.isUp) &&
         !(this.body.touching.down)
     ) {
-        this.body.velocity.y = 1500;
+        this.body.velocity.y = 800;
     }
 
   }

@@ -24,8 +24,10 @@ var gulp = require('gulp'),
         tsConfig: 'src/tsconfig.json',
         ts: 'src/**/*.ts',
         html: 'src/**/*.html',
-        images: 'src/assets/images/**/*.*',
+        images: 'src/assets/images/**/*.png',
+        atlases: 'src/assets/images/**/*.json',
         scss: 'src/scss/**/*.scss',
+        audio: 'src/assets/audio/**/*.*',
         scssMain: 'src/scss/main.scss',
         tilemaps: 'src/assets/tilemaps/*.json'
     };
@@ -62,8 +64,21 @@ gulp.task('vendor', () => {
 });
 
 gulp.task('images', () => {
+    return gulp.src(paths.atlases)
+        // .pipe(imageMin())
+        .pipe(gulp.dest('dist/assets/images/'));
+});
+
+gulp.task('audio', () => {
+    return gulp.src(paths.audio)
+        // .pipe(imageMin())
+        .pipe(gulp.dest('dist/assets/audio/'));
+});
+
+
+gulp.task('atlases', () => {
     return gulp.src(paths.images)
-        .pipe(imageMin())
+        // .pipe(imageMin())
         .pipe(gulp.dest('dist/assets/images/'));
 });
 
@@ -88,7 +103,9 @@ gulp.task('watch', () => {
         watchHtml   = gulp.watch(paths.html, ['html']),
         watchTs     = gulp.watch(paths.ts, ['tsc']),
         watchImages = gulp.watch(paths.images, ['images']),
+        watchAtlases = gulp.watch(paths.images, ['atlases']),
         watchTilemaps = gulp.watch(paths.tilemaps, ['tilemaps']),
+        watchAudio = gulp.watch(paths.audio, ['audio']),
 
         onChanged = (event) => console.log('File ' + event.path + ' was ' +
             event.type + '. Running tasks...');
@@ -97,7 +114,9 @@ gulp.task('watch', () => {
     watchHtml.on('change', onChanged);
     watchTs.on('change', onChanged);
     watchImages.on('change', onChanged);
+    watchAtlases.on('change', onChanged);
     watchTilemaps.on('change', onChanged);
+    watchAudio.on('change', onChanged);
 });
 
-gulp.task('default', [ 'html', 'tsc', 'scss', 'vendor', 'images', 'tilemaps' ]);
+gulp.task('default', [ 'html', 'tsc', 'scss', 'vendor', 'images', 'tilemaps', 'audio' ]);

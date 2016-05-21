@@ -18,8 +18,8 @@ export class Spotlight extends Phaser.Graphics {
     // this.clear();
     // this.game.physics.arcade.moveToPointer(this, 60, this.player.body, 500);
     this.clear();
-    this.beginFill(0xFFFFFF, 0.3);
-    this.drawCircle(this.player.body.x + this.player.body.width/2 - 100, this.player.body.y - 20, 100);
+    this.beginFill(0xFFFFFF, 0.2);
+    this.drawCircle(this.player.body.x - 140, this.player.body.y - 180, 130);
     // this.x = this.player.body.x;
     // this.y = this.player.body.y;
   }

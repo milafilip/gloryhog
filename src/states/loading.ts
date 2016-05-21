@@ -5,7 +5,7 @@ export class Loading extends Phaser.State {
 
     create() {
         let fontStyle = {
-            font: '18px Walter Turncoat',
+            font: '18px Arial',
             fill: '#7edcfc'
         };
 
@@ -22,10 +22,10 @@ export class Loading extends Phaser.State {
 
         this.load.setPreloadSprite(loadingBar);
 
-        this.loadingText = this.add.text(this.world.centerX,
-                                         this.world.centerY - 30,
-                                         'Loading...', fontStyle);
-        this.loadingText.anchor.setTo(0.5);
+        // this.loadingText = this.add.text(this.world.centerX,
+        //                                  this.world.centerY - 30,
+        //                                  'Loading...', fontStyle);
+        // this.loadingText.anchor.setTo(0.5);
 
         this.game.load.onFileComplete.add(this.fileComplete, this);
 

@@ -11,7 +11,6 @@ export class Player extends Phaser.Sprite {
   private jumpHeight: number = 400;
 
   private ms: number = 0;
-
   private leftButton;
   private rightButton;
 
@@ -23,17 +22,21 @@ export class Player extends Phaser.Sprite {
 
   public state;
 
-  constructor(game: Phaser.Game, x: number, y: number, leftButton, rightButton, local = false) {
+  constructor(game: Phaser.Game, x: number, y: number, leftButton, rightButton, local = false, jumpButton = null) {
     super(game, x, y, 'player', 0);
     this.local = local;
     this.rightButton = rightButton;
     this.leftButton = leftButton;
+    // this.jumpButton = leftButton;
     game.add.existing(this);
     game.physics.arcade.enableBody(this);
-    this.body.setSize(20, 20, 10, 47);
+    this.body.setSize(30, 60, 16, 28);
   }
 
   create() {
+    // this.animations.add('right', [0], 10, true);
+
+    this.body.fixedRotation = true;
     // this.mouseY = 0;
     // this.jumpDelay = 1000;
     this.canJump = true;
@@ -44,6 +47,7 @@ export class Player extends Phaser.Sprite {
     // this.body.gravity.y = 500;
     // this.body.gravity.y = 100;
     // this.game.world.wrap(this, 0, true);
+
   }
 
   checkOverlap(spriteA, spriteB) {
@@ -54,11 +58,16 @@ export class Player extends Phaser.Sprite {
 
   respawn() {
     this.body.y = 0;
-    this.body.x = this.game.rnd.integerInRange(0, 400);
+    this.body.x = this.game.rnd.integerInRange(90, 1150);
   }
 
   update() {
 
+    if (this.state == "HOLDING") {
+      this.frame = 2;
+    } else {
+      this.frame = 1;
+    }
 
     // if (this.body.y > 800) this.body.y = 0;
 
@@ -100,9 +109,9 @@ export class Player extends Phaser.Sprite {
     }
 
     if (this.direction === "R") {
-      this.body.velocity.x = 400;
+      this.body.velocity.x = 500;
     } else if (this.direction === "L") {
-      this.body.velocity.x = -400;
+      this.body.velocity.x = -500;
     } else if (this.direction === "") {
       this.body.velocity.x = 0;
     }
@@ -118,7 +127,7 @@ export class Player extends Phaser.Sprite {
       this.jumpCount++;
       this.body.velocity.y = -this.jumpHeight;
       if (!this.body.onFloor()) {
-        this.body.velocity.y -= 200;
+        this.body.velocity.y -= 300;
       }
     }
 
@@ -126,12 +135,16 @@ export class Player extends Phaser.Sprite {
       this.jumpCount = 0;
     }
 
+    if (this.body.touching.down) {
+      this.visible = true;
+    }
+
     if (
         (this.rightButton.isUp &&
           this.leftButton.isUp) &&
         !(this.body.touching.down)
     ) {
-        this.body.velocity.y = 800;
+        this.body.velocity.y = 500;
     }
 
   }

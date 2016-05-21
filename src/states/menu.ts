@@ -3,7 +3,7 @@ export class Menu extends Phaser.State {
 
     create() {
         let fontStyle = {
-            font: '18px Walter Turncoat',
+            font: '18px Arial',
             fill: '#7edcfc'
         };
 

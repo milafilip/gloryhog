@@ -35,18 +35,6 @@ export class Battle extends Phaser.State {
 
   preload() {
     this.game.stage.backgroundColor = '#7D4545';
-    this.game.load.atlas('player', 'assets/images/player.png', 'assets/images/player.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
-    this.game.load.atlas('conductor', 'assets/images/conductor.png', 'assets/images/conductor.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
-    this.game.load.tilemap('map', 'assets/tilemaps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
-    this.game.load.image('tilespng', 'assets/images/tiles.png');
-    this.game.load.image('tilespng2', 'assets/images/stage2.png');
-    this.game.load.image('oscar', 'assets/images/microphone.png');
-    this.game.load.audio('song', 'assets/audio/song.m4a');
-    this.game.load.audio('speech', 'assets/audio/speech.wav');
-    this.game.load.audio('stomp', 'assets/audio/stomp.wav');
-    this.game.load.audio('mic', 'assets/audio/mic.wav');
-    this.game.load.image('tear', 'assets/images/tear.png');
-    this.game.load.image('cloud', 'assets/images/cloud.png');
   }
 
   create() {

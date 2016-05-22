@@ -1,7 +1,5 @@
 export class Menu extends Phaser.State {
     preload() {
-
-      this.game.load.image('titlescreen', 'assets/images/titlescreen.png');
     }
 
     create() {

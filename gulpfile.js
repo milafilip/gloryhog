@@ -64,21 +64,19 @@ gulp.task('vendor', () => {
 });
 
 gulp.task('images', () => {
-    return gulp.src(paths.atlases)
-        // .pipe(imageMin())
+    return gulp.src(paths.images)
+        .pipe(imageMin())
         .pipe(gulp.dest('dist/assets/images/'));
 });
 
 gulp.task('audio', () => {
     return gulp.src(paths.audio)
-        // .pipe(imageMin())
         .pipe(gulp.dest('dist/assets/audio/'));
 });
 
 
 gulp.task('atlases', () => {
-    return gulp.src(paths.images)
-        // .pipe(imageMin())
+    return gulp.src(paths.atlases)
         .pipe(gulp.dest('dist/assets/images/'));
 });
 

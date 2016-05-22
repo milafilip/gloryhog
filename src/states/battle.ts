@@ -19,8 +19,11 @@ export class Battle extends Phaser.State {
   private countdownText: Phaser.Text;
   timer;
   timerEvent;
-  secondsRemaining = 10;
-
+  secondsRemaining = 15;
+  _holdingPlayer:Player;
+  speech;
+  emitter;
+  mic;
 
   pairwise(list) {
     if (list.length < 2) { return []; }
@@ -37,23 +40,27 @@ export class Battle extends Phaser.State {
     this.game.load.tilemap('map', 'assets/tilemaps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
     this.game.load.image('tilespng', 'assets/images/tiles.png');
     this.game.load.image('tilespng2', 'assets/images/stage2.png');
-    this.game.load.image('oscar', 'assets/images/oscar.png');
+    this.game.load.image('oscar', 'assets/images/microphone.png');
     this.game.load.audio('song', 'assets/audio/song.m4a');
+    this.game.load.audio('speech', 'assets/audio/speech.wav');
     this.game.load.audio('stomp', 'assets/audio/stomp.wav');
+    this.game.load.audio('mic', 'assets/audio/mic.wav');
+    this.game.load.image('tear', 'assets/images/tear.png');
+    this.game.load.image('cloud', 'assets/images/cloud.png');
   }
 
   create() {
-
-
     this.stomp = this.game.add.audio('stomp');
+    this.speech = this.game.add.audio('speech');
     this.music = this.game.add.audio('song');
+    this.mic = this.game.add.audio('mic');
 
     this.music.loop = true;
-
     this.musicVolume = 0.3;
 
     this.game.time.advancedTiming = true;
     this.map = this.game.add.tilemap('map');
+
     this.map.addTilesetImage('tiles','tilespng');
     this.map.addTilesetImage('foreground','tilespng2');
 
@@ -72,17 +79,35 @@ export class Battle extends Phaser.State {
     let cursors = this.game.input.keyboard.createCursorKeys();
     // // this.game.world.setBounds(0, 0, 1400, 1400);
     this.players = [
-      new Player(this.game,150,200,this.game.input.activePointer.leftButton, this.game.input.activePointer.rightButton, true, this.game.input.keyboard.addKey(Phaser.Keyboard.M)),
+      // new Player(this.game,150,200,this.game.input.activePointer.leftButton, this.game.input.activePointer.rightButton, true, this.game.input.keyboard.addKey(Phaser.Keyboard.M)),
+      new Player(this.game,150,200,this.game.input.keyboard.addKey(Phaser.Keyboard.J), this.game.input.keyboard.addKey(Phaser.Keyboard.L), true, this.game.input.keyboard.addKey(Phaser.Keyboard.I)),
       new Player(this.game,550,200,this.game.input.keyboard.addKey(Phaser.Keyboard.A), this.game.input.keyboard.addKey(Phaser.Keyboard.D), false, this.game.input.keyboard.addKey(Phaser.Keyboard.W)),
       new Player(this.game,750,200,this.game.input.keyboard.addKey(Phaser.Keyboard.F), this.game.input.keyboard.addKey(Phaser.Keyboard.H), false, this.game.input.keyboard.addKey(Phaser.Keyboard.T))
     ];
-    this.oscar = new Oscar(this.game, 500, 100);
+
+    let x = 0;
+    while (x === 0) {
+      x = this.game.rnd.integerInRange(100, 1100);
+      for (var i = 0; i < this.players.length; i++) {
+        if (Math.abs(this.players[i].body.x - x) < 150) { x = 0; }
+      }
+    }
+
+    let y = 0;
+    while (y === 0) {
+      y = this.game.rnd.integerInRange(100, 600);
+      for (var i = 0; i < this.players.length; i++) {
+        if (Math.abs(this.players[i].body.y - y) < 20) { y = 0; }
+      }
+    }
+
+    this.oscar = new Oscar(this.game, x, y);
+
 
     let topLayer = this.map.createLayer('Tile Layer 4');
     topLayer.alpha = 0.8;
 
-    this.spotlight = new Spotlight(this.game, this.players[0]);
-    this.spotlight.visible = false;
+    this.spotlight = new Spotlight(this.game, this.oscar);
     this.playerPairs = this.pairwise(this.players);
     // // this.game.camera.follow(this.players[0], Phaser.Camera.FOLLOW_PLATFORMER);
 
@@ -93,44 +118,57 @@ export class Battle extends Phaser.State {
 
     this.conductor = this.game.add.sprite(600,830,'conductor');
     this.conductor.animations.add('conducting', [0, 1, 2, 3, 4, 5, 6, 7], 1, true);
-    this.conductor.animations.play('conducting');
     // map.createFromObjects('Object Layer 1', 12, 'player', 0, true, false);
 
     let fontStyle = {
     font: '80px Gotham Black',
     fill: 'white'
     };
-    this.countdownText = this.game.add.text(643, 40, Math.round(this.secondsRemaining).toString(), fontStyle);
+    this.countdownText = this.game.add.text(643, 40, "", fontStyle);
     this.countdownText.anchor.setTo(0.5,0);
     this.timer = this.game.time.create();
     this.timerEvent = this.timer.add(Phaser.Timer.SECOND * this.secondsRemaining, this.endTimer, this);
+
+
+    this.emitter = this.game.add.emitter(0,0, 30);
+    this.emitter.makeParticles('tear');
+    this.emitter.gravity = 10;
   }
 
   endTimer() {
+    this.music.stop();
+    // this.speech.stop();
+    this.game.state.start('GameOver');
   }
 
   collectOscar(player, oscar) {
+    this.conductor.animations.play('conducting');
     oscar.destroy();
-    player.state = "HOLDING";
-    this.spotlight.followPlayer(player);
-    this.music.play();
-    if (this.timer && this.timer.running) {
-      this.timer.stop(false);
-    } else {
-      this.timer.start();
-    }
-    // this.map.putTile(100, this.layer3.getTileX(8), this.layer3.getTileY(15), this.layer);
+    this.holdingPlayer = player;
+
+    this.emitter.x = this.holdingPlayer.body.x + 5;
+    this.emitter.y = this.holdingPlayer.body.y + 15;
+
+    // this.emitter.start(false, 2000, null, 30);
+
+
+    this.emitter.minParticleSpeed.setTo(-350);
+    this.emitter.maxParticleSpeed.setTo(100);
+
+    this.emitter.flow(1000, 100, 2, -1);
+
+    player.body.y -= 30;
+
   }
 
   hitPlayer(player1,player2,recursive=true) {
-    if (player1.body.y > player2.body.y + 50) {
+
+    if (player1.body.y > player2.body.y + 55) {
       this.stomp.play();
-      player2.body.velocity.y= -500;
+      player2.body.velocity.y = -600;
+
       if (player1.state === "HOLDING") {
-        player2.state = "HOLDING";
-        this.spotlight.followPlayer(player2);
-        this.timer.stop(false);
-        this.timer.start();
+        this.holdingPlayer = player2;
       }
 
       let x = 0;
@@ -141,7 +179,6 @@ export class Battle extends Phaser.State {
         }
         player1.respawn(x);
       }
-      this.musicVolume = 0.3;
 
     } else if (recursive) {
       this.hitPlayer(player2, player1, false);
@@ -149,10 +186,20 @@ export class Battle extends Phaser.State {
   };
 
   update() {
-    this.musicVolume += 0.001;
+
+    if (this.holdingPlayer && this.holdingPlayer.body) {
+      this.emitter.x = this.holdingPlayer.body.x + 15;
+      this.emitter.y = this.holdingPlayer.body.y + 10;
+
+    }
+
+    this.musicVolume += 0.01;
+    this.speech.volume = Math.min(this.speech.volume + 0.01, 0.6);
     this.game.physics.arcade.collide(this.oscar, this.layer);
     this.game.physics.arcade.collide(this.oscar, this.layer3);
-    this.countdownText.text = Math.round((this.timerEvent.delay - this.timer.ms) / 1000).toString();
+    if (this.timer.running) {
+      this.countdownText.text = Math.round((this.timerEvent.delay - this.timer.ms) / 1000).toString();
+    }
 
     // this.game.physics.arcade.overlap(this.players, this.platforms);
     // this.game.physics.arcade.overlap(this.players[0], [this.players[1],this.players[2]], this.hitPlayer, null, this);
@@ -171,7 +218,6 @@ export class Battle extends Phaser.State {
 
   render() {
     this.game.debug.text(this.game.time.fps.toString(), 200, 20, "#ff0000");
-
   }
 
   public get musicVolume():number {
@@ -179,14 +225,41 @@ export class Battle extends Phaser.State {
   }
 
   public set musicVolume(val:number) {
-    this.music.volume = Math.min(val, 1.5);
-    let conductorSpeed = Math.max(this.music.volume * 30, 0);
+    this.music.volume = Math.max(val, 0.5);
+    let conductorSpeed = Math.max(val * 30, 0);
     if (conductorSpeed == 0) {
-      this.conductor.animations.paused = true;
+      // this.conductor.animations.paused = true;
     } else{
-      // this.conductor.animations.currentAnim.speed = conductorSpeed;
-      // this.conductor.animations.paused = false;
+      if (this.conductor && this.conductor.animations.currentAnim) {
+        this.conductor.animations.paused = false;
+        this.conductor.animations.currentAnim.speed = conductorSpeed;
+      }
     }
+  }
+
+  public get holdingPlayer():Player {
+    return this._holdingPlayer;
+  }
+
+  public set holdingPlayer(val:Player) {
+    this._holdingPlayer = val;
+    val.state = "HOLDING";
+    this.spotlight.followPlayer(val);
+    this.musicVolume = 0.7;
+    this.music.play();
+    this.speech.volume = 0.1;
+    this.speech.play();
+    this.mic.play();
+
+    // if (this.timer) {
+      if (this.timer.running) {
+        this.timer.stop(false);
+      }
+    this.timer.start();
+
+    // }
+
+      this.countdownText.text = Math.round((this.timerEvent.delay - this.timer.ms) / 1000).toString();
   }
 
 }

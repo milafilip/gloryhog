@@ -17,17 +17,22 @@ export class Boot extends Phaser.State {
 
     create() {
       // this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+      // this.game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+      // this.game.scale.maxWidth = 800;
+      // this.game.scale.maxHeight = 600;
+
       this.game.input.maxPointers = 1;
+      this.fontLoaded = true;
 
-      if (!this.game.device.desktop) {
-        this.scale.forceOrientation(true, false); // Landscape
-        //this.scale.forceOrientation(false, true); // Portrait
-      }
+      // if (!this.game.device.desktop) {
+      //   this.scale.forceOrientation(true, false); // Landscape
+      //   //this.scale.forceOrientation(false, true); // Portrait
+      // }
+      //
+      // this.scale.pageAlignHorizontally = true;
+      // this.scale.pageAlignVertically = true;
 
-      this.scale.pageAlignHorizontally = true;
-      this.scale.pageAlignVertically = true;
-
-      this.game.world.setBounds(0, 0, 1280, 900);
+      // this.game.world.setBounds(0, 0, 1280, 900);
 
       //this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // Use max screen space
     }

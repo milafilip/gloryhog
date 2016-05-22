@@ -1,14 +1,17 @@
 export class Menu extends Phaser.State {
-    text: Phaser.Text;
+    preload() {
+
+      this.game.load.image('titlescreen', 'assets/images/titlescreen.png');
+    }
 
     create() {
-        let fontStyle = {
-            font: '18px Arial',
-            fill: '#7edcfc'
-        };
 
-        this.text = this.add.text(this.world.centerX, 50,
-                                  'Main Menu', fontStyle);
-        this.text.anchor.setTo(0.5, 0.5);
+      let image = this.game.add.sprite(0,0,'titlescreen');
+      image.inputEnabled = true;
+      image.events.onInputDown.addOnce(this.buttonClicked, this);
+    }
+
+    buttonClicked() {
+      this.game.state.start('Battle');
     }
 }

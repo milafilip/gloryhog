@@ -27,7 +27,7 @@ export class Boot extends Phaser.State {
       this.scale.pageAlignHorizontally = true;
       this.scale.pageAlignVertically = true;
 
-      // this.game.world.setBounds(0, 0, 1024, 768);
+      this.game.world.setBounds(0, 0, 1280, 900);
 
       //this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // Use max screen space
     }

@@ -1,53 +1,55 @@
 export class Player extends Phaser.Sprite {
 
-  private _health: number = 100;
-  private healthText: Phaser.Text;
-
   private jumpCount:number = 0;
-
   private leftDownAt: number = 0;
   private rightDownAt: number = 0;
-
   private jumpHeight: number = 400;
-
   private ms: number = 0;
+
+  secondsRemaining: number = 15.0;
+  // private timerEvent;
+  // private timer;
+  private countdownText: Phaser.Text;
+
   private leftButton;
   private rightButton;
+  private jumpButton;
 
   private canJump;
   public direction;
-
-  private spotlight;
-  public local;
-
-  public state;
+  private _state;
 
   constructor(game: Phaser.Game, x: number, y: number, leftButton, rightButton, local = false, jumpButton = null) {
     super(game, x, y, 'player', 0);
-    this.local = local;
     this.rightButton = rightButton;
     this.leftButton = leftButton;
-    // this.jumpButton = leftButton;
-    game.add.existing(this);
     game.physics.arcade.enableBody(this);
+    game.add.existing(this);
     this.body.setSize(30, 60, 16, 28);
+    this.respawn();
+    this.jumpButton = jumpButton;//game.input.keyboard.addKey(Phaser.Keyboard.W);
+    this.jumpButton.onDown.add(this.jumpCheck, this);
+
+    let fontStyle = {
+    font: '14px Arial',
+    fill: 'red'
+    };
+    this.countdownText = this.game.add.text(0, 0, 'stuff', fontStyle);
+    this.countdownText.anchor.setTo(0.5, 0);
+    // this.timer = game.time.create();
+    // this.timerEvent = this.timer.add(Phaser.Timer.SECOND * this.secondsRemaining, this.endTimer, this);
+    // this.timer.start();
   }
 
-  create() {
-    // this.animations.add('right', [0], 10, true);
+  // endTimer() {
+  //   this.timer.stop();
+  // }
 
-    this.body.fixedRotation = true;
-    // this.mouseY = 0;
-    // this.jumpDelay = 1000;
-    this.canJump = true;
-    this.body.collideWorldBounds = true;
-    this.body.maxVelocity.y = 1000;
-    this.anchor.set(0.5)
-    console.log(this);
-    // this.body.gravity.y = 500;
-    // this.body.gravity.y = 100;
-    // this.game.world.wrap(this, 0, true);
-
+  jumpCheck() {
+    if (this.jumpCount < 2) {
+      this.jumpCount++;
+      this.body.velocity.y = (this.jumpCount == 2) ? -600 : -450;
+    }
   }
 
   checkOverlap(spriteA, spriteB) {
@@ -56,12 +58,33 @@ export class Player extends Phaser.Sprite {
     return Phaser.Rectangle.intersects(boundsA, boundsB);
   }
 
-  respawn() {
-    this.body.y = 0;
-    this.body.x = this.game.rnd.integerInRange(90, 1150);
+  respawn(x=this.game.rnd.integerInRange(90, 1150)) {
+    console.log("RESPAWN");
+    this.state = "SEEKING";
+    this.body.y = 200;
+    this.body.x = x;
+  }
+
+  create() {
+    console.log("A");
+    this.canJump = true;
+    this.body.fixedRotation = true;
+    this.body.collideWorldBounds = true;
+    this.body.maxVelocity.y = 800;
+    this.anchor.set(0.5);
   }
 
   update() {
+
+    this.ms = new Date().getTime();
+
+    // if (this.timer.running) {
+    //   this.countdownText.text = Math.round((this.timerEvent.delay - this.timer.ms) / 1000).toString();
+    // } else {
+    //   this.countdownText.text = "";
+    // }
+    // this.countdownText.x = this.body.x + this.body.width/2;
+    // this.countdownText.y = this.body.y - 10;
 
     if (this.state == "HOLDING") {
       this.frame = 2;
@@ -69,43 +92,12 @@ export class Player extends Phaser.Sprite {
       this.frame = 1;
     }
 
-    // if (this.body.y > 800) this.body.y = 0;
-
-    this.ms = new Date().getTime();
-    this.direction = "";
-
-    // this.healthText.x = this.body.x + this.body.width/2;
-    // this.healthText.y = this.body.y - 10;
-
-    if (this.leftButton.isDown)
-    {
-      if (this.rightButton.isUp) {
-          this.leftDownAt = this.ms;
-      }
-    } else {
-      this.leftDownAt = 0;
-      this.canJump = true;
-    }
-
-    if (this.rightButton.isDown)
-    {
-      if (this.leftButton.isUp) {
-          this.rightDownAt = this.ms;
-      }
-    } else {
-      this.rightDownAt = 0;
-      this.canJump = true;
-    }
-
-    if (this.rightButton.isUp && this.leftButton.isUp) {
-      this.direction = "";
-    }
-
-    if (this.leftDownAt > 0) {
+    if (this.leftButton.isDown) {
       this.direction = "L";
-    }
-    if (this.rightDownAt > 0) {
+    } else if (this.rightButton.isDown) {
       this.direction = "R";
+    } else {
+      this.direction = "";
     }
 
     if (this.direction === "R") {
@@ -116,48 +108,41 @@ export class Player extends Phaser.Sprite {
       this.body.velocity.x = 0;
     }
 
-    if (
-      ( this.rightButton.isDown &&
-        this.leftButton.isDown) &&
-        this.jumpCount < 1 &&
-        this.canJump //(player.body.touching.down)
-      )
-    {
-      this.canJump = false;
-      this.jumpCount++;
-      this.body.velocity.y = -this.jumpHeight;
-      if (!this.body.onFloor()) {
-        this.body.velocity.y -= 300;
-      }
-    }
-
-    if (this.body.blocked.down) {
+    if (this.body.blocked.down || this.body.touching.down) {
       this.jumpCount = 0;
     }
-
-    if (this.body.touching.down) {
-      this.visible = true;
-    }
-
-    if (
-        (this.rightButton.isUp &&
-          this.leftButton.isUp) &&
-        !(this.body.touching.down)
-    ) {
-        this.body.velocity.y = 500;
-    }
-
+    //
+    // if (this.body.blocked.down || this.body.touching.down) {
+    //   if (this.jumpButton && this.jumpButton.isDown) {
+    //     this.jumpCount = 1;
+    //     this.body.velocity.y = -800;
+    //   } else {
+    //     this.jumpCount = 0;
+    //   }
+    // } else {
+    //   if (this.jumpButton && this.jumpButton.isDown) {
+    //     if (this.jumpCount == 1) {
+    //       this.jumpCount = 2;
+    //       this.body.velocity.y = -500;
+    //     }
+    //   }
+    // }
   }
 
-  public get health():number {
-    return this._health;
+
+  public get state():String {
+    return this._state;
   }
 
-  public set health(val:number) {
-    if(this._health > 0) {
-      this._health = val;
-      this.healthText.text = this._health.toString();
-    }
+  public set state(val:String) {
+    this._state = val;
+    // 
+    // if (val === "HOLDING") {
+    //   this.timer.start();
+    // } else {
+    //   if (this.timer && this.timer.running) this.timer.stop();
+    // }
+
   }
 
 }

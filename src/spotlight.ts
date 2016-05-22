@@ -6,32 +6,19 @@ export class Spotlight extends Phaser.Graphics {
   player: Player;
 
   constructor(game: Phaser.Game, player: Player) {
-    super(game,player.body.x,player.body.y);
+    super(game,0,0);
     this.player = player;
-    // super(game, player.body.x, player.body.y, 'player', 0);
-    // this.game = game;
-    // this.player = player;
     game.add.existing(this);
   }
 
+  followPlayer(player: Player) {
+    this.player = player;
+    this.visible = true;
+  }
+
   update() {
-    // this.clear();
-    // this.game.physics.arcade.moveToPointer(this, 60, this.player.body, 500);
     this.clear();
     this.beginFill(0xFFFFFF, 0.2);
-    this.drawCircle(this.player.body.x - 140, this.player.body.y - 180, 130);
-    // this.x = this.player.body.x;
-    // this.y = this.player.body.y;
+    this.drawCircle(this.player.body.x + 20, this.player.body.y + 10, 130);
   }
-      // this.spotlight = new Spotlightthis.game.add.graphics(0, 0);
-      // this.spotlight.clear();
 }
-//
-//
-//     if (this.local && this.body.touching.down && this.leftButton.isUp && this.rightButton.isUp) {
-//
-//       this.spotlight.beginFill(0xFFFFFF, 0.4);
-//       this.spotlight.drawCircle(this.body.x + this.body.width/2, this.body.y + this.body.height/2, 200);
-//     }
-//
-// game.physics.arcade.moveToPointer(sprite, 60, game.input.activePointer, 500);

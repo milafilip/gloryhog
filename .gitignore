@@ -1,3 +1,4 @@
 node_modules
 dist
 *.m4a
+deploy.sh
